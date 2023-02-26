@@ -21,6 +21,7 @@ class DDLGenerator {
 
   String generate(Entity entity) {
     var ddl = 'CREATE TABLE ${entity.name} (\n';
+    ddl += '  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,\n';
     entity.properties.forEach((element) {
       var key = element.key;
       var type = element.type;

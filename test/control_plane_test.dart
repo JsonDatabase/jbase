@@ -10,6 +10,7 @@ void main() {
     controlPlane.addEntity('Car', '{"make": "Ford", "model": "Fiesta"}');
     String ddl = controlPlane.generateDDL();
     expect(ddl,
-        'CREATE TABLE Person (\n  name VARCHAR (250),\n  age INT,\n  over_18 SMALLINT,\n  height DOUBLE(10,2),\n);\nCREATE TABLE Car (\n  make VARCHAR (250),\n  model VARCHAR (250),\n);');
+        'CREATE TABLE Person (\n  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,\n  name VARCHAR (250),\n  age INT,\n  over_18 SMALLINT,\n  height DOUBLE(10,2),\n);\nCREATE TABLE Car (\n  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,\n  make VARCHAR (250),\n  model VARCHAR (250),\n);');
   });
+
 }
