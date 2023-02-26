@@ -1,39 +1,25 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# JBase Package
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+## Directory Structure
+### /src
+The src directory contains the source code for the project. It contains the following subdirectories:
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+### /src/control_plane
+The control_plane directory contains the source code for the control plane of the project.
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+control_plane.dart: This file contains the source code for the control plane.
+### /src/ddl_generator
+The ddl_generator directory contains the source code for the DDL generator of the project.
 
-## Features
+ddl_generator.dart: This file contains the source code for the DDL generator.
+### /src/entity_repository
+The entity_repository directory contains the source code for the entity repository of the project.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+entity.dart: This file contains the source code for the entity.
+entity_property.dart: This file contains the source code for the entity property.
+entity_repository.dart: This file contains the source code for the entity repository.
+### /src/json_parser
+The json_parser directory contains the source code for the JSON parser of the project.
 
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+json_parser.dart: This file contains the source code for the JSON parser.
+json_parser_result.dart: This file contains the source code for the JSON parser result.
