@@ -30,5 +30,6 @@ json_parser_result.dart: This file contains the source code for the JSON parser 
 * Primary Keys
 * Array & Objects
 * Error Handling
-
+* SP Generation 
+* MYSQL / Postgres SQL
 

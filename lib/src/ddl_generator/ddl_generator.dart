@@ -1,7 +1,11 @@
+import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 
 class DDLGenerator {
+  final DatabaseType databaseType;
+  DDLGenerator(this.databaseType);
+
   String typeConversion(EntityPropertyType type) {
     switch (type) {
       case EntityPropertyType.string:

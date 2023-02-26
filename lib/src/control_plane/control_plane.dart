@@ -1,9 +1,16 @@
+import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
 import 'package:jbase_package/src/ddl_generator/ddl_generator.dart';
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 class ControlPlane {
-  final EntityRepository _entityRepository = EntityRepository();
-  final DDLGenerator _ddlGenerator = DDLGenerator();
+  late EntityRepository _entityRepository;
+  late DDLGenerator _ddlGenerator;
+  late ControlPlaneSetting _controlPlaneSetting;
+  ControlPlane(ControlPlaneSetting controlPlaneSetting) {
+    _controlPlaneSetting = controlPlaneSetting;
+    _entityRepository = EntityRepository();
+    _ddlGenerator = DDLGenerator(_controlPlaneSetting.databaseType);
+  }
 
   void addEntity(String name, String json) {
     _entityRepository.addEntity(name, json);
