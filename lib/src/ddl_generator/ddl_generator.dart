@@ -1,12 +1,7 @@
+import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 
-import '../entity_repository/entity.dart';
-
 class DDLGenerator {
-  Entity entity;
-
-  DDLGenerator(this.entity);
-
   String typeConversion(EntityPropertyType type) {
     switch (type) {
       case EntityPropertyType.string:
@@ -20,7 +15,7 @@ class DDLGenerator {
     }
   }
 
-  String generate() {
+  String generate(Entity entity) {
     var ddl = 'CREATE TABLE ${entity.name} (\n';
     entity.properties.forEach((element) {
       var key = element.key;

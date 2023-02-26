@@ -23,3 +23,12 @@ The json_parser directory contains the source code for the JSON parser of the pr
 
 json_parser.dart: This file contains the source code for the JSON parser.
 json_parser_result.dart: This file contains the source code for the JSON parser result.
+
+
+## TO DO
+
+* Primary Keys
+* Array & Objects
+* Error Handling
+
+

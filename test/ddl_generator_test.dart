@@ -12,8 +12,8 @@ void main() {
     entity.addProperty(EntityProperty('over_18', EntityPropertyType.bool));
     entity.addProperty(EntityProperty('height', EntityPropertyType.double));
 
-    DDLGenerator ddlGenerator = DDLGenerator(entity);
-    String ddl = ddlGenerator.generate();
+    DDLGenerator ddlGenerator = DDLGenerator();
+    String ddl = ddlGenerator.generate(entity);
     expect(ddl,
         'CREATE TABLE person (\n  name VARCHAR (250),\n  age INT,\n  over_18 SMALLINT,\n  height DOUBLE(10,2),\n);');
   });

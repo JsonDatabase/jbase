@@ -1,5 +1,3 @@
 library jbase_package;
 
-class ControlPlane {
-  
-}
+export 'src/control_plane/control_plane.dart';
