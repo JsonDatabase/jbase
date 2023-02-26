@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jbase_package/src/ddl_generator/ddl_generator.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
-import 'package:jbase_package/src/json_parser/json_parser.dart';
-import 'package:jbase_package/src/json_parser/json_parser_result.dart';
 
 void main() {
   test('DDL Generator', () {
@@ -16,6 +14,7 @@ void main() {
 
     DDLGenerator ddlGenerator = DDLGenerator(entity);
     String ddl = ddlGenerator.generate();
-    print(ddl);
+    expect(ddl,
+        'CREATE TABLE person (\n  name VARCHAR (250),\n  age INT,\n  over_18 SMALLINT,\n  height DOUBLE(10,2),\n);');
   });
 }
