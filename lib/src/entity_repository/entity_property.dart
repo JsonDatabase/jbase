@@ -5,4 +5,9 @@ class EntityProperty {
   EntityPropertyType type;
 
   EntityProperty(this.key, this.type);
+
+  @override
+  String toString() {
+    return 'EntityProperty{key: $key, type: $type}';
+  }
 }
