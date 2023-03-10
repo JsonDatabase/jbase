@@ -9,7 +9,7 @@ class ControlPlane {
   ControlPlane(ControlPlaneSetting controlPlaneSetting) {
     _controlPlaneSetting = controlPlaneSetting;
     _entityRepository = EntityRepository();
-    _ddlGenerator = DDLGenerator(_controlPlaneSetting.databaseType);
+    _ddlGenerator = DDLGenerator(_controlPlaneSetting);
   }
 
   void addEntity(String name, String json) {
@@ -18,6 +18,10 @@ class ControlPlane {
 
   String allEntities() {
     return _entityRepository.entities.toString();
+  }
+
+  void removeEntity(String name) {
+    _entityRepository.removeEntity(name);
   }
 
   String generateDDL() {

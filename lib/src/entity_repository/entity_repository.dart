@@ -10,12 +10,16 @@ class EntityRepository {
   final List<Entity> _entities = [];
 
   Entity addEntity(String name, String json) {
+    Entity? existingEntity = matchingEntity(json);
+    if (existingEntity != null) {
+      return existingEntity;
+    }
     Entity entity = Entity();
     entity.name = name;
     JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
     jsonParserResult.mappedJson.forEach((key, value) {
       EntityPropertyType entityPropertyType = EntityPropertyType.string;
-      dynamic entityPropertyValue;
+      Entity? entityPropertyValue;
       if (value is int) {
         entityPropertyType = EntityPropertyType.int;
       } else if (value is double) {
@@ -34,5 +38,25 @@ class EntityRepository {
     return entity;
   }
 
+  void removeEntity(String name) {
+    _entities.removeWhere((entity) => entity.name == name);
+  }
+
   get entities => _entities;
+
+  Entity? matchingEntity(String json) {
+    Entity? matchingEntity;
+    JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
+    _entities.forEach((entity) {
+      for (int i = 0; i < entity.properties.length; i++) {
+        matchingEntity = entity;
+
+        if (!jsonParserResult.mappedJson
+            .containsKey(entity.properties[i].key)) {
+          matchingEntity = null;
+        }
+      }
+    });
+    return matchingEntity;
+  }
 }
