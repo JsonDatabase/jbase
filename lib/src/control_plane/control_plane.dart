@@ -16,6 +16,10 @@ class ControlPlane {
     _entityRepository.addEntity(name, json);
   }
 
+  String allEntities() {
+    return _entityRepository.entities.toString();
+  }
+
   String generateDDL() {
     return _entityRepository.entities.map((entity) {
       return _ddlGenerator.generate(entity);
