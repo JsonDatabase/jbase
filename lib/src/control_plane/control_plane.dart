@@ -12,6 +12,8 @@ class ControlPlane {
     _ddlGenerator = DDLGenerator(_controlPlaneSetting);
   }
 
+  get entities => _entityRepository.entities;
+
   void addEntity(String name, String json) {
     _entityRepository.addEntity(name, json);
   }
