@@ -13,11 +13,18 @@ class EntityProperty {
 
   @override
   String toString() {
-    if (value != null) {
-      String nestedKey = value?.name as String;
-      return 'EntityProperty{key: $key, value: $nestedKey}';
+    if (type == EntityPropertyType.entity) {
+      return "Entity Type ${value.toString()}";
+    } else if (type == EntityPropertyType.string) {
+      return "String";
+    } else if (type == EntityPropertyType.int) {
+      return "Int";
+    } else if (type == EntityPropertyType.double) {
+      return "Double";
+    } else if (type == EntityPropertyType.bool) {
+      return "Bool";
     } else {
-      return 'EntityProperty{key: $key, type: $type}';
+      return "Unknown";
     }
   }
 }
