@@ -24,7 +24,7 @@ class Entity implements Comparable<Entity> {
 
   @override
   String toString() {
-    return 'Entity{name: $name, properties: $properties}';
+    return name;
   }
 
   @override
