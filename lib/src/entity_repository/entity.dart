@@ -10,6 +10,18 @@ class Entity implements Comparable<Entity> {
 
   List<EntityProperty> get properties => _properties;
 
+  int get propertyCount => _properties.length;
+
+  int get entityPropertyCount {
+    int count = 0;
+    for (EntityProperty property in _properties) {
+      if (property.type == EntityPropertyType.entity) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   @override
   String toString() {
     return 'Entity{name: $name, properties: $properties}';
