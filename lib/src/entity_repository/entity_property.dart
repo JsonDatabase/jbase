@@ -9,6 +9,8 @@ class EntityProperty {
 
   EntityProperty(this.key, {required this.type, this.value});
 
+  bool get isEntity => type == EntityPropertyType.entity;
+
   @override
   String toString() {
     if (value != null) {
