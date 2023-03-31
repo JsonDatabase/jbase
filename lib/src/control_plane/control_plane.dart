@@ -1,5 +1,6 @@
 import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
 import 'package:jbase_package/src/ddl_generator/ddl_generator.dart';
+import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 class ControlPlane {
@@ -38,4 +39,9 @@ class ControlPlane {
       return _ddlGenerator.generate(entity);
     }).join('\n');
   }
+
+  String generateIndividualDDL(Entity entity) {
+    return _ddlGenerator.generate(entity);
+  }
+  
 }
