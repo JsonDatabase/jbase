@@ -14,6 +14,8 @@ class ControlPlane {
 
   get entities => _entityRepository.entities;
 
+  ControlPlaneSetting get setting => _controlPlaneSetting;
+
   void addEntity(String name, String json) {
     _entityRepository.addEntity(name, json);
   }
