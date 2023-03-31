@@ -16,6 +16,11 @@ class ControlPlane {
 
   ControlPlaneSetting get setting => _controlPlaneSetting;
 
+  void setSetting(ControlPlaneSetting controlPlaneSetting) {
+    _controlPlaneSetting = controlPlaneSetting;
+    _ddlGenerator = DDLGenerator(_controlPlaneSetting);
+  }
+
   void addEntity(String name, String json) {
     _entityRepository.addEntity(name, json);
   }
