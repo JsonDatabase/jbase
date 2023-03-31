@@ -43,5 +43,4 @@ class ControlPlane {
   String generateIndividualDDL(Entity entity) {
     return _ddlGenerator.generate(entity);
   }
-  
 }

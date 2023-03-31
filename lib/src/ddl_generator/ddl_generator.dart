@@ -1,4 +1,5 @@
 import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
+import 'package:jbase_package/src/ddl_generator/utils/stored_procedures.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 
@@ -50,14 +51,26 @@ class DDLGenerator {
       ddl += '\n  $element\n';
     });
 
-    ddl += ');\n';
+    ddl += ');\n\n';
+
+    ddl += generateStoredProcedures(entity);
+    ddl += '\n\n';
+    ddl += generateGet(entity);
+    ddl += '\n\n';
+    ddl += generateCreate(entity);
+    ddl += '\n\n';
+    ddl += generateUpdate(entity);
+    ddl += '\n\n';
+    ddl += generateDelete(entity);
+    ddl += '\n\n';
+
+    ddl += '\n';
 
     return ddl;
   }
 
   String generateStoredProcedures(Entity entity) {
-    var ddl = '';
-    return ddl;
+    return generateGetAll(entity);
   }
 
   String generateAll(List<Entity> entities) {
