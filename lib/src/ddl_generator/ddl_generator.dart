@@ -24,22 +24,25 @@ class DDLGenerator {
   String generate(Entity entity) {
     var foreignKeyRepository = [];
 
-    var ddl = 'CREATE TABLE ${entity.name} (\n';
+    var ddl = 'CREATE TABLE ${entity.name.toLowerCase()} (\n';
+
     if (controlPlaneSetting.primaryKeyStrategy == PrimaryKeyStrategy.auto) {
       ddl += '  ${_generatePrimaryKey()},\n';
     }
+
     entity.properties.forEach((element) {
       if (element.type == EntityPropertyType.entity) {
         var key = '${element.key.substring(0, 1)}id';
         var type = 'BIGINT UNSIGNED';
         var nullable = 'NOT NULL';
-        ddl += '  $key $type $nullable,\n';
+        ddl += '  ${key.toLowerCase()} $type $nullable,\n';
+
         foreignKeyRepository.add(
-            'CONSTRAINT ${element.key}_${entity.name.toLowerCase()}_${element.value?.name.toLowerCase()}_id_fk FOREIGN KEY ($key) REFERENCES ${element.value?.name.toLowerCase()} (id);');
+            'CONSTRAINT ${element.key.toLowerCase()}_${entity.name.toLowerCase()}_${element.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${key.toLowerCase()}) REFERENCES ${element.value?.name.toLowerCase()} (id);');
       } else {
         var key = element.key;
         var type = element.type;
-        ddl += '  $key ${typeConversion(type)},\n';
+        ddl += '  ${key.toLowerCase()} ${typeConversion(type)},\n';
       }
     });
 
@@ -54,8 +57,6 @@ class DDLGenerator {
 
   String generateStoredProcedures(Entity entity) {
     var ddl = '';
-    return ddl;
-    ddl += ');';
     return ddl;
   }
 

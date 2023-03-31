@@ -10,6 +10,7 @@ class EntityRepository {
   final List<Entity> _entities = [];
 
   Entity addEntity(String name, String json) {
+    List<Map<String, dynamic>> tempEntities = [];
     Entity? existingEntity = matchingEntity(json);
     if (existingEntity != null) {
       return existingEntity;
@@ -26,6 +27,14 @@ class EntityRepository {
         entityPropertyType = EntityPropertyType.double;
       } else if (value is bool) {
         entityPropertyType = EntityPropertyType.bool;
+      } else if (value[0] is Map<String, dynamic>) {
+        // Add Check for Array of Entities
+        value[0][entity.name] = jsonDecode(json);
+        tempEntities.add({
+          'key': key,
+          'value': value[0],
+        });
+        return;
       } else if (value is Map<String, dynamic>) {
         entityPropertyValue = addEntity(key, jsonEncode(value));
         entityPropertyType = EntityPropertyType.entity;
@@ -35,6 +44,11 @@ class EntityRepository {
       entity.properties.add(entityProperty);
     });
     _entities.add(entity);
+
+    tempEntities.forEach((tempEntity) {
+      addEntity(tempEntity['key'], jsonEncode(tempEntity['value']));
+    });
+
     return entity;
   }
 
