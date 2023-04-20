@@ -3,7 +3,7 @@ import 'package:jbase_package/jbase_package.dart';
 String stringRepo(Entity entity, String value, DatabaseType databaseType) {
   switch (databaseType) {
     case DatabaseType.mysql:
-      String body = mySqlRepo(value, entity);
+      dynamic body = mySqlRepo(value, entity);
       return body[0];
     case DatabaseType.postgresql:
       return 'package:jbase_package/src/repository/postgresql_repository.dart';
@@ -25,7 +25,7 @@ mySqlRepo(String value, Entity entity) {
     'createTableConstraints': entity.properties.map((property) => property
                 .type ==
             EntityPropertyType.entity
-        ? 'CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id);'
+        ? '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id); \n'
         : ''),
     'createProcedureHeader':
         'CREATE PROCEDURE ${entity.name}Create(${entity.name.substring(0, 2).toLowerCase()}Obj JSON)\nBEGIN\n\n',

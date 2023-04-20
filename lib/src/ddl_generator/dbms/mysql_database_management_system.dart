@@ -1,13 +1,19 @@
+import 'package:jbase_package/jbase_package.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.dart';
-import 'package:jbase_package/src/entity_repository/entity.dart';
+import 'package:jbase_package/src/ddl_generator/utils/repository.dart';
 
 class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   MYSQLDatabaseManagementSystem(super.controlPlaneSetting);
 
   @override
   String generateDDL(Entity entity) {
-    // TODO: implement generateDDL
-    throw UnimplementedError();
+    dynamic header =
+        stringRepo(entity, 'createTableHeader', DatabaseType.mysql);
+    dynamic body =
+        stringRepo(entity, 'createTableBaseColumn', DatabaseType.mysql);
+    dynamic constraints =
+        stringRepo(entity, 'createTableConstraints', DatabaseType.mysql);
+    return '$header$body$constraints);\n\n';
   }
 
   @override
