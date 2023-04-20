@@ -6,7 +6,7 @@ class ControlPlaneSetting {
           PrimaryKeyIncrementStrategy.auto,
       PrimaryKeySizeStrategy primaryKeySizeStrategy =
           PrimaryKeySizeStrategy.auto,
-      DatabaseConnection? databaseConnection,
+      DatabaseCredential? databaseCredential,
       DatabaseCredentialStorage databaseCredentialStorage =
           DatabaseCredentialStorage.inMemory}) {
     return ControlPlaneSetting._(
@@ -14,7 +14,7 @@ class ControlPlaneSetting {
         primaryKeyStrategy: primaryKeyStrategy,
         primaryKeyIncrementStrategy: primaryKeyIncrementStrategy,
         primaryKeySizeStrategy: primaryKeySizeStrategy,
-        databaseConnection: databaseConnection ?? DatabaseConnection.empty(),
+        databaseCredential: databaseCredential ?? DatabaseCredential.empty(),
         databaseCredentialStorage: databaseCredentialStorage);
   }
 
@@ -23,7 +23,7 @@ class ControlPlaneSetting {
       required this.primaryKeyStrategy,
       required this.primaryKeyIncrementStrategy,
       required this.primaryKeySizeStrategy,
-      required this.databaseConnection,
+      required this.databaseCredential,
       required this.databaseCredentialStorage});
 
   DatabaseType databaseType = DatabaseType.mysql;
@@ -31,7 +31,7 @@ class ControlPlaneSetting {
   PrimaryKeyIncrementStrategy primaryKeyIncrementStrategy =
       PrimaryKeyIncrementStrategy.auto;
   PrimaryKeySizeStrategy primaryKeySizeStrategy = PrimaryKeySizeStrategy.auto;
-  DatabaseConnection databaseConnection = DatabaseConnection.empty();
+  DatabaseCredential databaseCredential = DatabaseCredential.empty();
   DatabaseCredentialStorage databaseCredentialStorage =
       DatabaseCredentialStorage.inMemory;
 
@@ -41,14 +41,13 @@ class ControlPlaneSetting {
       'primaryKeyStrategy': primaryKeyStrategy.toString(),
       'primaryKeyIncrementStrategy': primaryKeyIncrementStrategy.toString(),
       'primaryKeySizeStrategy': primaryKeySizeStrategy.toString(),
-      'databaseConnection': databaseConnection.toJson(),
       'databaseCredentialStorage': databaseCredentialStorage.toString(),
     };
   }
 }
 
-class DatabaseConnection {
-  DatabaseConnection({
+class DatabaseCredential {
+  DatabaseCredential({
     required this.host,
     required this.port,
     required this.username,
@@ -56,7 +55,7 @@ class DatabaseConnection {
     required this.database,
   });
 
-  DatabaseConnection.empty();
+  DatabaseCredential.empty();
 
   String host = '';
   String port = '';
@@ -64,7 +63,7 @@ class DatabaseConnection {
   String password = '';
   String database = '';
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'host': host,
       'port': port,
@@ -72,6 +71,16 @@ class DatabaseConnection {
       'password': password,
       'database': database,
     };
+  }
+
+  factory DatabaseCredential.fromMap(Map<String, dynamic> map) {
+    return DatabaseCredential(
+      host: map['host'],
+      port: map['port'],
+      username: map['username'],
+      password: map['password'],
+      database: map['database'],
+    );
   }
 }
 

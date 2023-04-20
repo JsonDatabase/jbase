@@ -1,4 +1,6 @@
 import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
+import 'package:jbase_package/src/database/database_connection.dart';
+import 'package:jbase_package/src/database/mysql_database_connection.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/mysql_database_management_system.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/oracle_database_management_system.dart';
@@ -11,12 +13,11 @@ class ControlPlane {
   late EntityRepository _entityRepository;
   late DatabaseManagementSystem _databaseManagementSystem;
   late ControlPlaneSetting _controlPlaneSetting;
+  late DatabaseConnection _databaseConnection;
 
   ControlPlane(ControlPlaneSetting controlPlaneSetting) {
-    _controlPlaneSetting = controlPlaneSetting;
     _entityRepository = EntityRepository();
-    _databaseManagementSystem =
-        MYSQLDatabaseManagementSystem(_controlPlaneSetting);
+    setSetting(controlPlaneSetting);
   }
 
   get entities => _entityRepository.entities;
@@ -29,6 +30,8 @@ class ControlPlane {
       case DatabaseType.mysql:
         _databaseManagementSystem =
             MYSQLDatabaseManagementSystem(_controlPlaneSetting);
+        _databaseConnection =
+            MYSQLDatabaseConnection(_controlPlaneSetting.databaseCredential);
         break;
       case DatabaseType.postgresql:
         _databaseManagementSystem =
@@ -41,6 +44,7 @@ class ControlPlane {
       case DatabaseType.sqlserver:
         _databaseManagementSystem =
             SQLServerDatabaseManagementSystem(_controlPlaneSetting);
+
         break;
     }
   }
@@ -66,5 +70,9 @@ class ControlPlane {
 
   String generateIndividualDDL(Entity entity) {
     return _databaseManagementSystem.generateDDL(entity);
+  }
+
+  Future<bool> testDatabaseConnection() async {
+    return await _databaseConnection.testConnection();
   }
 }
