@@ -39,6 +39,7 @@ class MYSQLDatabaseConnection implements DatabaseConnection {
       await connection.close();
       return true;
     } catch (error) {
+      print(error);
       return false;
     }
   }
