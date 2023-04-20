@@ -11,6 +11,7 @@ class ControlPlane {
   late EntityRepository _entityRepository;
   late DatabaseManagementSystem _databaseManagementSystem;
   late ControlPlaneSetting _controlPlaneSetting;
+
   ControlPlane(ControlPlaneSetting controlPlaneSetting) {
     _controlPlaneSetting = controlPlaneSetting;
     _entityRepository = EntityRepository();
