@@ -48,21 +48,13 @@ class ControlPlaneSetting {
 }
 
 class DatabaseConnection {
-  factory DatabaseConnection({
-    required String host,
-    required String port,
-    required String username,
-    required String password,
-    required String database,
-  }) {
-    return DatabaseConnection(
-      host: host,
-      port: port,
-      username: username,
-      password: password,
-      database: database,
-    );
-  }
+  DatabaseConnection({
+    required this.host,
+    required this.port,
+    required this.username,
+    required this.password,
+    required this.database,
+  });
 
   DatabaseConnection.empty();
 
