@@ -1,23 +1,16 @@
 import 'dart:convert';
 
+import 'package:jbase_package/jbase_package.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 import 'package:jbase_package/src/json_parser/json_parser.dart';
 import 'package:jbase_package/src/json_parser/json_parser_result.dart';
 
 class EntityRepository {
+  final ControlPlane controlPlane;
+  EntityRepository(this.controlPlane);
   final JsonParser _jsonParser = JsonParser();
   final List<Entity> _entities = [];
-
-  EntityRepository();
-  factory EntityRepository.fromMap(Map<String, dynamic> map) {
-    EntityRepository entityRepository = EntityRepository();
-    List<dynamic> entities = map['entities'];
-    for (int i = 0; i < entities.length; i++) {
-      entityRepository._entities.add(Entity.fromMap(entities[i]));
-    }
-    return entityRepository;
-  }
 
   Entity addEntity(String name, String json) {
     Entity? existingEntity = matchingEntity(json);
@@ -53,8 +46,15 @@ class EntityRepository {
       } else {
         continue;
       }
+      final String databaseManagementSystemColumnType = controlPlane
+          .databaseManagementSystem
+          .entityPropertyTypeToColumnDataType(entityPropertyType);
       entity.addProperty(EntityProperty(
-          key: key, type: entityPropertyType, value: entityPropertyValue));
+          key: key,
+          type: entityPropertyType,
+          value: entityPropertyValue,
+          databaseManagementSystemColumnType:
+              databaseManagementSystemColumnType));
     }
     _entities.add(entity);
     return entity;

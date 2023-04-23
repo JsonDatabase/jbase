@@ -13,7 +13,7 @@ class ControlPlane {
   late DatabaseConnection _databaseConnection;
 
   ControlPlane(ControlPlaneSetting controlPlaneSetting) {
-    _entityRepository = EntityRepository();
+    _entityRepository = EntityRepository(this);
     setSetting(controlPlaneSetting);
   }
 

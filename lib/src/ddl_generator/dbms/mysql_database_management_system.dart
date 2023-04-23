@@ -84,4 +84,24 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       'SET'
     ];
   }
+
+  @override
+  String entityPropertyTypeToColumnDataType(EntityPropertyType type) {
+    switch (type) {
+      case EntityPropertyType.bool:
+        return 'BIT';
+      case EntityPropertyType.int:
+        return 'INT';
+      case EntityPropertyType.double:
+        return 'DOUBLE';
+      case EntityPropertyType.string:
+        return 'TEXT';
+      case EntityPropertyType.entity:
+        return 'Foreign Key Reference';
+      case EntityPropertyType.list:
+        return 'Foreign Key Reference';
+      default:
+        return '';
+    }
+  }
 }

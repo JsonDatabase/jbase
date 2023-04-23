@@ -1,5 +1,4 @@
-import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
-import 'package:jbase_package/src/entity_repository/entity.dart';
+import 'package:jbase_package/jbase_package.dart';
 
 abstract class DatabaseManagementSystem {
   DatabaseManagementSystem(ControlPlaneSetting controlPlaneSetting);
@@ -13,4 +12,6 @@ abstract class DatabaseManagementSystem {
   String generateEntityDeleteStoredProcedure(Entity entity);
 
   List<String> columnDataTypes();
+
+  String entityPropertyTypeToColumnDataType(EntityPropertyType type);
 }
