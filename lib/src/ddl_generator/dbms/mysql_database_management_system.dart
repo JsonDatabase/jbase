@@ -1,14 +1,18 @@
 import 'package:jbase_package/jbase_package.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.dart';
+import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   MYSQLDatabaseManagementSystem(ControlPlaneSetting controlPlaneSetting)
       : super(controlPlaneSetting);
 
   @override
-  String generateExecutableEntityDDL(Entity entity) {
-    String ddl = generateEntityDDL(entity);
-    ddl += generateEntityStoredProcedures(entity);
+  String generateExecutableEntityDDL(EntityRepository entityRepository) {
+    String ddl = '';
+    for (Entity entity in entityRepository.entities) {
+      ddl += generateEntityDDL(entity);
+      ddl += generateEntityStoredProcedures(entity);
+    }
     return ddl;
   }
 
@@ -30,7 +34,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (EntityProperty property in entity.properties) {
       if (property.type == EntityPropertyType.entity) {
         ddl +=
-            '  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id); \n';
+            '  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id) \n';
       }
     }
     ddl += ');\n\n';
@@ -51,10 +55,16 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
-      body +=
-          "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+      if (property.type == EntityPropertyType.entity) {
+        body +=
+            generateInnerSelectNested(property.value as Entity, entity.name);
+      } else {
+        body +=
+            "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+      }
     }
-    body += '   ))\n FROM ${entity.name};\n\nEND;';
+    body +=
+        ' ))\n ) FROM ${entity.name} ${entity.name.substring(0, 2).toLowerCase()};\n\nEND;';
     return body;
   }
 
@@ -67,20 +77,15 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
       if (property.type == EntityPropertyType.entity) {
-        body += generateInnerSelect(property.value as Entity);
+        body +=
+            generateInnerSelectNested(property.value as Entity, entity.name);
       } else {
         body +=
             "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
       }
     }
-    // entity.properties.forEach((property) {
-    //   if (property.type == EntityPropertyType.entity) {
-    //     body += generateInnerSelect(property.value as Entity);
-    //   } else {
-    //     body += byIdBody(property);
-    //   }
-    // });
-    body += byIdFooter(entity);
+    body +=
+        '))\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
     body += '\n\nEND;';
     return body;
   }
@@ -147,9 +152,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
+      bool nextPropertyIsEntity = false;
       if (property.type != EntityPropertyType.entity) {
         ddl +=
-            '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',\n' : ''}';
+            '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty && !nextPropertyIsEntity ? ',\n' : ''}';
       }
     }
     ddl += ' WHERE id = @${entity.name.substring(0, 2).toLowerCase()}Id;';
@@ -230,23 +236,26 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     }
   }
 
-  String generateInnerSelect(Entity entity) {
-    String returnString = '\'${entity.name}\', (';
+  String generateInnerSelectNested(Entity entity, String parentName) {
+    String returnString = '   \'${entity.name}\', (';
     returnString += selectJson();
-    entity.properties.forEach((property) {
-      returnString += byIdBody(property);
-      if (property.type == EntityPropertyType.entity) {}
-    });
-    returnString += byIdFooter(entity);
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
+      returnString +=
+          "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+    }
+    returnString +=
+        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.id = ${parentName.substring(0, 2).toLowerCase()}.${entity.name.substring(0, 1)}id';
     return returnString;
   }
 
   String byIdFooter(Entity entity) {
-    return '   )\n FROM ${entity.name} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
+    return ')\n FROM ${entity.name} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
   }
 
   String byIdBody(EntityProperty property) {
-    return "   '${property.key}', ${property.key},\n";
+    return "      '${property.key}', ${property.key},\n";
   }
 
   String selectJson() {

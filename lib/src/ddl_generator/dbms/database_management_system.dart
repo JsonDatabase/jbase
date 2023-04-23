@@ -1,4 +1,5 @@
 import 'package:jbase_package/jbase_package.dart';
+import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 abstract class DatabaseManagementSystem {
   DatabaseManagementSystem(ControlPlaneSetting controlPlaneSetting);
@@ -11,7 +12,7 @@ abstract class DatabaseManagementSystem {
   String generateEntityUpdateStoredProcedure(Entity entity);
   String generateEntityDeleteStoredProcedure(Entity entity);
 
-  String generateExecutableEntityDDL(Entity entity);
+  String generateExecutableEntityDDL(EntityRepository entityRepository);
 
   List<String> columnDataTypes();
 

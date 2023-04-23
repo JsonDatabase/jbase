@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:jbase_package/jbase_package.dart';
-import 'package:jbase_package/src/entity_repository/entity.dart';
-import 'package:jbase_package/src/entity_repository/entity_property.dart';
 import 'package:jbase_package/src/json_parser/json_parser.dart';
 import 'package:jbase_package/src/json_parser/json_parser_result.dart';
 
@@ -17,7 +15,7 @@ class EntityRepository {
     if (existingEntity != null) {
       return existingEntity;
     }
-    Entity entity = Entity(name: name);
+    Entity entity = Entity(name: name.toLowerCase());
     JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
     for (int i = 0; i < jsonParserResult.mappedJson.length; i++) {
       EntityPropertyType entityPropertyType = EntityPropertyType.string;

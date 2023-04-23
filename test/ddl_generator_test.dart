@@ -13,7 +13,7 @@ void main() {
     Entity person = entityRepository.addEntity('Person', json);
     MYSQLDatabaseManagementSystem dbms =
         MYSQLDatabaseManagementSystem(ControlPlaneSetting());
-    String ddl = dbms.generateExecutableEntityDDL(person);
+    String ddl = dbms.generateExecutableEntityDDL(entityRepository);
     print(ddl);
     // expect(
     //     ddl,
