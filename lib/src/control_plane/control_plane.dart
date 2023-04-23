@@ -20,7 +20,8 @@ class ControlPlane {
   List<Entity> get entities => _entityRepository.entities;
 
   ControlPlaneSetting get setting => _controlPlaneSetting;
-
+  DatabaseManagementSystem get databaseManagementSystem =>
+      _databaseManagementSystem;
   void setSetting(ControlPlaneSetting controlPlaneSetting) {
     _controlPlaneSetting = controlPlaneSetting;
     switch (controlPlaneSetting.databaseType) {

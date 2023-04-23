@@ -11,4 +11,6 @@ abstract class DatabaseManagementSystem {
   String generateEntityInsertStoredProcedure(Entity entity);
   String generateEntityUpdateStoredProcedure(Entity entity);
   String generateEntityDeleteStoredProcedure(Entity entity);
+
+  List<String> columnDataTypes();
 }

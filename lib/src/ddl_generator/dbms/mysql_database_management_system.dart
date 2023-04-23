@@ -46,4 +46,42 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     // TODO: implement generateEntityUpdateStoredProcedure
     throw UnimplementedError();
   }
+
+  @override
+  List<String> columnDataTypes() {
+    return [
+      'BIT',
+      'BOOL',
+      'BOOLEAN',
+      'TINYINT',
+      'SMALLINT',
+      'MEDIUMINT',
+      'INT',
+      'INTEGER',
+      'BIGINT',
+      'FLOAT',
+      'DOUBLE',
+      'DECIMAL',
+      'NUMERIC',
+      'DATE',
+      'TIME',
+      'YEAR',
+      'DATETIME',
+      'TIMESTAMP',
+      'CHAR',
+      'VARCHAR',
+      'BINARY',
+      'VARBINARY',
+      'TINYBLOB',
+      'BLOB',
+      'MEDIUMBLOB',
+      'LONGBLOB',
+      'TINYTEXT',
+      'TEXT',
+      'MEDIUMTEXT',
+      'LONGTEXT',
+      'ENUM',
+      'SET'
+    ];
+  }
 }
