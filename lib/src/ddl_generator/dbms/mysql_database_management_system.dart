@@ -50,19 +50,38 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityInsertStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityInsertStoredProcedure
+    String ddl =
+        'CREATE PROCEDURE ${entity.name}Create(${entity.name.substring(0, 2).toLowerCase()}Obj JSON)\nBEGIN\n\n';
+    for (EntityProperty property in entity.properties) {
+      ddl +=
+          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
+    }
+    ddl += '\n INSERT INTO ${entity.name} (\n';
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
+      ddl += '   ${property.key}${!isLastProperty ? ',' : ''}\n';
+    }
+    ddl += '\n ) VALUES (\n';
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
+      ddl +=
+          '   JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',' : ''}\n';
+    }
+    ddl += ' );\n\nEND';
+    return ddl;
+  }
+
+  @override
+  String generateEntityUpdateStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityUpdateStoredProcedure
     throw UnimplementedError();
   }
 
   @override
   String generateEntityStoredProcedures(Entity entity) {
     // TODO: implement generateEntityStoredProcedures
-    throw UnimplementedError();
-  }
-
-  @override
-  String generateEntityUpdateStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityUpdateStoredProcedure
     throw UnimplementedError();
   }
 

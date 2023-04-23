@@ -16,7 +16,7 @@ void main() {
     Entity person = entityRepository.addEntity('Person', json);
     MYSQLDatabaseManagementSystem dbms =
         MYSQLDatabaseManagementSystem(ControlPlaneSetting());
-    String ddl = dbms.generateEntityDDL(person);
+    String ddl = dbms.generateEntityInsertStoredProcedure(person);
     print(ddl);
     // expect(
     //     ddl,
