@@ -9,11 +9,11 @@ void main() {
     ControlPlaneSetting controlPlaneSetting = ControlPlaneSetting();
     ControlPlane controlPlane = ControlPlane(controlPlaneSetting);
     EntityRepository entityRepository = EntityRepository(controlPlane);
-    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8}';
+    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8, "address": {"street": "Main Street", "number": 123}}';
     Entity person = entityRepository.addEntity('Person', json);
     MYSQLDatabaseManagementSystem dbms =
         MYSQLDatabaseManagementSystem(ControlPlaneSetting());
-    String ddl = dbms.generateEntityStoredProcedures(person);
+    String ddl = dbms.generateExecutableEntityDDL(person);
     print(ddl);
     // expect(
     //     ddl,

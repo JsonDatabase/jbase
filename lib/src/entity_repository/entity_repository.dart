@@ -32,13 +32,13 @@ class EntityRepository {
         entityPropertyType = EntityPropertyType.bool;
       } else if (value is String) {
         entityPropertyType = EntityPropertyType.string;
-      } else if (value is Map<String, dynamic>) {
+      } else if (value is Map<String, dynamic>) { //Nested
         if (value == {}) {
           continue;
         }
         entityPropertyValue = addEntity(key, jsonEncode(value));
         entityPropertyType = EntityPropertyType.entity;
-      } else if (value is List<dynamic> && value.isNotEmpty) {
+      } else if (value is List<dynamic> && value.isNotEmpty) { // Array
         dynamic firstValue = value.first;
         if (firstValue is Map<String, dynamic>) {
           entityPropertyValue = addEntity(key, jsonEncode(firstValue));

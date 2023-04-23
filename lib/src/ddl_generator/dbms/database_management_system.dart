@@ -11,6 +11,8 @@ abstract class DatabaseManagementSystem {
   String generateEntityUpdateStoredProcedure(Entity entity);
   String generateEntityDeleteStoredProcedure(Entity entity);
 
+  String generateExecutableEntityDDL(Entity entity);
+
   List<String> columnDataTypes();
 
   String entityPropertyTypeToColumnDataType(EntityPropertyType type);
