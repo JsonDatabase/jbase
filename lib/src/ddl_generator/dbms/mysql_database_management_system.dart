@@ -75,8 +75,24 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityUpdateStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityUpdateStoredProcedure
-    throw UnimplementedError();
+    String ddl =
+        'CREATE PROCEDURE ${entity.name}Update(${entity.name.substring(0, 2).toLowerCase()}Obj JSON)\nBEGIN\n\n';
+    ddl +=
+        ' SET @${entity.name.substring(0, 2).toLowerCase()}Id = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.id\');\n';
+    for (EntityProperty property in entity.properties) {
+      ddl +=
+          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
+    }
+    ddl += '\n UPDATE ${entity.name} SET\n';
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
+      ddl +=
+          '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',\n' : ''}';
+    }
+    ddl += '\n WHERE id = @${entity.name.substring(0, 2).toLowerCase()}Id;';
+    ddl += '\n\nEND';
+    return ddl;
   }
 
   @override
