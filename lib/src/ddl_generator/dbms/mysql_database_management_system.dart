@@ -147,10 +147,12 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
-      ddl +=
-          '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',\n' : ''}';
+      if (property.type != EntityPropertyType.entity) {
+        ddl +=
+            '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',\n' : ''}';
+      }
     }
-    ddl += '\n WHERE id = @${entity.name.substring(0, 2).toLowerCase()}Id;';
+    ddl += ' WHERE id = @${entity.name.substring(0, 2).toLowerCase()}Id;';
     ddl += '\n\nEND;';
     return ddl;
   }
