@@ -7,7 +7,7 @@ class EntityProperty {
   final EntityPropertyType type;
   final Entity? value;
   String databaseManagementSystemColumnType = "VARCHAR(500)";
-  String defaultValue = "";
+  String? defaultValue;
   bool isPrimaryKey = false;
 
   EntityProperty({
@@ -15,7 +15,7 @@ class EntityProperty {
     required this.type,
     this.value,
     this.databaseManagementSystemColumnType = "VARCHAR(500)",
-    this.defaultValue = "",
+    this.defaultValue,
     this.isPrimaryKey = false,
   });
 
