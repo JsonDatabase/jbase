@@ -44,7 +44,11 @@ class EntityRepository {
         entityPropertyType = EntityPropertyType.entity;
       } else if (value is List<dynamic> && value.isNotEmpty) {
         dynamic firstValue = value.first;
-        entityPropertyValue = addEntity(key, jsonEncode(firstValue));
+        if (firstValue is Map<String, dynamic>) {
+          entityPropertyValue = addEntity(key, jsonEncode(firstValue));
+        } else {
+          continue;
+        }
         entityPropertyType = EntityPropertyType.list;
       } else {
         continue;
