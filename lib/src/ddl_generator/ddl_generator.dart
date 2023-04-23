@@ -7,20 +7,20 @@ import 'package:jbase_package/src/entity_repository/entity_property.dart';
 //   final ControlPlaneSetting controlPlaneSetting;
 //   DDLGenerator(this.controlPlaneSetting);
 
-  // String typeConversion(EntityPropertyType type) {
-  //   switch (type) {
-  //     case EntityPropertyType.string:
-  //       return 'VARCHAR (250)';
-  //     case EntityPropertyType.int:
-  //       return 'INT';
-  //     case EntityPropertyType.double:
-  //       return 'DOUBLE(10,2)';
-  //     case EntityPropertyType.bool:
-  //       return 'SMALLINT';
-  //     case EntityPropertyType.entity:
-  //       return '$type';
-  //   }
-  // }
+// String typeConversion(EntityPropertyType type) {
+//   switch (type) {
+//     case EntityPropertyType.string:
+//       return 'VARCHAR (250)';
+//     case EntityPropertyType.int:
+//       return 'INT';
+//     case EntityPropertyType.double:
+//       return 'DOUBLE(10,2)';
+//     case EntityPropertyType.bool:
+//       return 'SMALLINT';
+//     case EntityPropertyType.entity:
+//       return '$type';
+//   }
+// }
 
 //   String generate(Entity entity) {
 //     var foreignKeyRepository = [];

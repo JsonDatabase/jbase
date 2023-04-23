@@ -6,14 +6,21 @@ class EntityProperty {
   final String key;
   final EntityPropertyType type;
   final Entity? value;
+  String dbType;
 
-  EntityProperty({required this.key, required this.type, this.value});
+  EntityProperty({
+    required this.key,
+    required this.type,
+    this.value,
+    this.dbType = "TEXT",
+  });
 
   factory EntityProperty.fromMap(Map<String, dynamic> map) {
     return EntityProperty(
       key: map['key'],
       type: EntityPropertyType.values[map['type']],
       value: map['value'] != null ? Entity.fromMap(map['value']) : null,
+      dbType: map['dbType'],
     );
   }
 
@@ -43,6 +50,7 @@ class EntityProperty {
       'key': key,
       'type': type.index,
       'value': value?.toMap(),
+      'dbType': dbType,
     };
   }
 }

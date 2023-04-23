@@ -21,4 +21,33 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     // TODO: implement generateStoredProcedures
     throw UnimplementedError();
   }
+  
+  @override
+  String generateDeleteStoredProcedure(Entity entity) {
+    // TODO: implement generateDeleteStoredProcedure
+    throw UnimplementedError();
+  }
+  
+  @override
+  String generateGetAllStoredProcedure(Entity entity) {
+    // TODO: implement generateGetAllStoredProcedure
+    throw UnimplementedError();
+  }
+  
+  @override
+  String generateGetByIdStoredProcedure(Entity entity) {
+    // TODO: implement generateGetByIdStoredProcedure
+    throw UnimplementedError();
+  }
+  
+  @override
+  String generateInsertStoredProcedure(Entity entity) {
+    // TODO: implement generateInsertStoredProcedure
+    throw UnimplementedError();
+  }
+  
+  @override
+  String generateUpdateStoredProcedure(Entity entity) {
+    
+  }
 }

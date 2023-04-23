@@ -26,6 +26,22 @@ class ControlPlaneSetting {
       required this.databaseCredential,
       required this.databaseCredentialStorage});
 
+  factory ControlPlaneSetting.fromMap(Map<String, dynamic> map) {
+    return ControlPlaneSetting(
+      databaseType: DatabaseType.values
+          .firstWhere((element) => element.toString() == map['databaseType']),
+      primaryKeyStrategy: PrimaryKeyStrategy.values.firstWhere(
+          (element) => element.toString() == map['primaryKeyStrategy']),
+      primaryKeyIncrementStrategy: PrimaryKeyIncrementStrategy.values
+          .firstWhere((element) =>
+              element.toString() == map['primaryKeyIncrementStrategy']),
+      primaryKeySizeStrategy: PrimaryKeySizeStrategy.values.firstWhere(
+          (element) => element.toString() == map['primaryKeySizeStrategy']),
+      databaseCredentialStorage: DatabaseCredentialStorage.values.firstWhere(
+          (element) => element.toString() == map['databaseCredentialStorage']),
+    );
+  }
+
   DatabaseType databaseType = DatabaseType.mysql;
   PrimaryKeyStrategy primaryKeyStrategy = PrimaryKeyStrategy.auto;
   PrimaryKeyIncrementStrategy primaryKeyIncrementStrategy =
