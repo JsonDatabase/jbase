@@ -30,7 +30,9 @@ class EntityProperty {
     );
   }
 
-  bool get isEntity => type == EntityPropertyType.entity;
+  bool get isEntity => type == EntityPropertyType.entity && value != null;
+
+  bool get isList => type == EntityPropertyType.list && value != null;
 
   @override
   String toString() {
