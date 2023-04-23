@@ -31,8 +31,9 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityDeleteStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityDeleteStoredProcedure
-    throw UnimplementedError();
+    String deleteSP =
+        'CREATE PROCEDURE ${entity.name}Delete(${entity.name.substring(0, 2).toLowerCase()}Id bigint unsigned) \nBEGIN \n\n DELETE FROM ${entity.name} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;\n\nEND';
+    return deleteSP;
   }
 
   @override
