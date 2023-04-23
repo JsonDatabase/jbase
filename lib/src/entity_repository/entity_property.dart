@@ -6,13 +6,15 @@ class EntityProperty {
   final String key;
   final EntityPropertyType type;
   final Entity? value;
-  String dbType;
+  String databaseManagementSystemColumnType = "VARCHAR(500)";
+  String defaultValue = "";
 
   EntityProperty({
     required this.key,
     required this.type,
     this.value,
-    this.dbType = "TEXT",
+    this.databaseManagementSystemColumnType = "VARCHAR(500)",
+    this.defaultValue = "",
   });
 
   factory EntityProperty.fromMap(Map<String, dynamic> map) {
@@ -20,7 +22,8 @@ class EntityProperty {
       key: map['key'],
       type: EntityPropertyType.values[map['type']],
       value: map['value'] != null ? Entity.fromMap(map['value']) : null,
-      dbType: map['dbType'],
+      databaseManagementSystemColumnType: map['dbType'],
+      defaultValue: map['defaultValue'],
     );
   }
 
@@ -50,7 +53,8 @@ class EntityProperty {
       'key': key,
       'type': type.index,
       'value': value?.toMap(),
-      'dbType': dbType,
+      'dbType': databaseManagementSystemColumnType,
+      'defaultValue': defaultValue,
     };
   }
 }

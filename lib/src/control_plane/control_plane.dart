@@ -59,7 +59,7 @@ class ControlPlane {
   }
 
   String generateIndividualDDL(Entity entity) {
-    return _databaseManagementSystem.generateDDL(entity);
+    return _databaseManagementSystem.generateEntityDDL(entity);
   }
 
   Future<bool> testDatabaseConnection() async {

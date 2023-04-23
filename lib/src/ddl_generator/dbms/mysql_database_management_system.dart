@@ -6,48 +6,44 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   MYSQLDatabaseManagementSystem(super.controlPlaneSetting);
 
   @override
-  String generateDDL(Entity entity) {
-    dynamic header =
-        stringRepo(entity, 'createTableHeader', DatabaseType.mysql);
-    dynamic body =
-        stringRepo(entity, 'createTableBaseColumn', DatabaseType.mysql);
-    dynamic constraints =
-        stringRepo(entity, 'createTableConstraints', DatabaseType.mysql);
-    return '$header$body$constraints);\n\n';
+  String generateEntityDDL(Entity entity) {
+    // TODO: implement generateEntityDDL
+    throw UnimplementedError();
   }
 
   @override
-  String generateStoredProcedures(Entity entity) {
-    // TODO: implement generateStoredProcedures
+  String generateEntityDeleteStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityDeleteStoredProcedure
     throw UnimplementedError();
   }
-  
+
   @override
-  String generateDeleteStoredProcedure(Entity entity) {
-    // TODO: implement generateDeleteStoredProcedure
+  String generateEntityGetAllStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityGetAllStoredProcedure
     throw UnimplementedError();
   }
-  
+
   @override
-  String generateGetAllStoredProcedure(Entity entity) {
-    // TODO: implement generateGetAllStoredProcedure
+  String generateEntityGetByIdStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityGetByIdStoredProcedure
     throw UnimplementedError();
   }
-  
+
   @override
-  String generateGetByIdStoredProcedure(Entity entity) {
-    // TODO: implement generateGetByIdStoredProcedure
+  String generateEntityInsertStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityInsertStoredProcedure
     throw UnimplementedError();
   }
-  
+
   @override
-  String generateInsertStoredProcedure(Entity entity) {
-    // TODO: implement generateInsertStoredProcedure
+  String generateEntityStoredProcedures(Entity entity) {
+    // TODO: implement generateEntityStoredProcedures
     throw UnimplementedError();
   }
-  
+
   @override
-  String generateUpdateStoredProcedure(Entity entity) {
-    
+  String generateEntityUpdateStoredProcedure(Entity entity) {
+    // TODO: implement generateEntityUpdateStoredProcedure
+    throw UnimplementedError();
   }
 }
