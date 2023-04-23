@@ -3,9 +3,9 @@ import 'package:jbase_package/src/entity_repository/entity.dart';
 enum EntityPropertyType { string, int, double, bool, entity, list }
 
 class EntityProperty {
-  String key;
-  EntityPropertyType type;
-  Entity? value;
+  final String key;
+  final EntityPropertyType type;
+  final Entity? value;
 
   EntityProperty({required this.key, required this.type, this.value});
 
@@ -41,7 +41,7 @@ class EntityProperty {
   Map<String, dynamic> toMap() {
     return {
       'key': key,
-      'type': type,
+      'type': type.index,
       'value': value?.toMap(),
     };
   }

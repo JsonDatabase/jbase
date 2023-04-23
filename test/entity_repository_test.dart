@@ -114,4 +114,75 @@ void main() {
     expect(entity?.properties[5].value?.properties[1].type,
         EntityPropertyType.int);
   });
+
+  test("Entity Repository To Map", () {
+    EntityRepository entityRepository = EntityRepository();
+    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8}';
+    entityRepository.addEntity('Person', json);
+    Map<String, dynamic> map = entityRepository.toMap();
+    expect(map, {
+      "entities": [
+        {
+          "name": "Person",
+          "properties": [
+            {"key": "name", "type": 0, "value": null},
+            {"key": "age", "type": 1, "value": null},
+            {"key": "over_18", "type": 3, "value": null},
+            {"key": "height", "type": 2, "value": null}
+          ]
+        }
+      ]
+    });
+  });
+
+  test("Entity Repository From Map", () {
+    EntityRepository entityRepository = EntityRepository();
+    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8}';
+    entityRepository.addEntity('Person', json);
+    Map<String, dynamic> map = entityRepository.toMap();
+    EntityRepository entityRepository2 = EntityRepository.fromMap(map);
+    expect(entityRepository2.toMap(), map);
+  });
+
+  test("Entity To Map", () {
+    Entity entity = Entity(name: 'Person');
+    entity.addProperty(
+        EntityProperty(key: 'name', type: EntityPropertyType.string));
+    entity.addProperty(EntityProperty(
+      key: 'age',
+      type: EntityPropertyType.int,
+    ));
+    entity.addProperty(EntityProperty(
+      key: 'over_18',
+      type: EntityPropertyType.bool,
+    ));
+
+    Map<String, dynamic> map = entity.toMap();
+    expect(map, {
+      "name": "Person",
+      "properties": [
+        {"key": "name", "type": 0, "value": null},
+        {"key": "age", "type": 1, "value": null},
+        {"key": "over_18", "type": 3, "value": null}
+      ]
+    });
+  });
+
+  test("Entity From Map", () {
+    Entity entity = Entity(name: 'Person');
+    entity.addProperty(
+        EntityProperty(key: 'name', type: EntityPropertyType.string));
+    entity.addProperty(EntityProperty(
+      key: 'age',
+      type: EntityPropertyType.int,
+    ));
+    entity.addProperty(EntityProperty(
+      key: 'over_18',
+      type: EntityPropertyType.bool,
+    ));
+
+    Map<String, dynamic> map = entity.toMap();
+    Entity entity2 = Entity.fromMap(map);
+    expect(entity2.toMap(), map);
+  });
 }

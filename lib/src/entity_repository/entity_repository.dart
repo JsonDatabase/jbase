@@ -9,6 +9,16 @@ class EntityRepository {
   final JsonParser _jsonParser = JsonParser();
   final List<Entity> _entities = [];
 
+  EntityRepository();
+  factory EntityRepository.fromMap(Map<String, dynamic> map) {
+    EntityRepository entityRepository = EntityRepository();
+    List<dynamic> entities = map['entities'];
+    for (int i = 0; i < entities.length; i++) {
+      entityRepository._entities.add(Entity.fromMap(entities[i]));
+    }
+    return entityRepository;
+  }
+
   Entity addEntity(String name, String json) {
     Entity? existingEntity = matchingEntity(json);
     if (existingEntity != null) {
@@ -75,5 +85,11 @@ class EntityRepository {
       }
     }
     return matchingEntity;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'entities': _entities.map((x) => x.toMap()).toList(),
+    };
   }
 }
