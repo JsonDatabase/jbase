@@ -17,7 +17,7 @@ class ControlPlane {
     setSetting(controlPlaneSetting);
   }
 
-  get entities => _entityRepository.entities;
+  List<Entity> get entities => _entityRepository.entities;
 
   ControlPlaneSetting get setting => _controlPlaneSetting;
 

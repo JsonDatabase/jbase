@@ -8,6 +8,7 @@ class EntityProperty {
   final Entity? value;
   String databaseManagementSystemColumnType = "VARCHAR(500)";
   String defaultValue = "";
+  bool isPrimaryKey = false;
 
   EntityProperty({
     required this.key,
@@ -15,6 +16,7 @@ class EntityProperty {
     this.value,
     this.databaseManagementSystemColumnType = "VARCHAR(500)",
     this.defaultValue = "",
+    this.isPrimaryKey = false,
   });
 
   factory EntityProperty.fromMap(Map<String, dynamic> map) {
@@ -24,6 +26,7 @@ class EntityProperty {
       value: map['value'] != null ? Entity.fromMap(map['value']) : null,
       databaseManagementSystemColumnType: map['dbType'],
       defaultValue: map['defaultValue'],
+      isPrimaryKey: map['isPrimaryKey'] ?? false,
     );
   }
 
@@ -55,6 +58,7 @@ class EntityProperty {
       'value': value?.toMap(),
       'dbType': databaseManagementSystemColumnType,
       'defaultValue': defaultValue,
+      'isPrimaryKey': isPrimaryKey,
     };
   }
 }
