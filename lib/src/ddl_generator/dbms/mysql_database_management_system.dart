@@ -97,9 +97,9 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       case EntityPropertyType.string:
         return 'TEXT';
       case EntityPropertyType.entity:
-        return 'Foreign Key Reference';
+        return 'Foreign Key Reference (Single)';
       case EntityPropertyType.list:
-        return 'Foreign Key Reference';
+        return 'Foreign Key Reference (Multiple)';
       default:
         return '';
     }
