@@ -1,25 +1,36 @@
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 
 class Entity implements Comparable<Entity> {
-  String name = '';
-  final List<EntityProperty> _properties = [];
+  List<EntityProperty> properties = [];
+  String name;
 
-  void addProperty(EntityProperty entityProperty) {
-    _properties.add(entityProperty);
+  Entity({
+    required this.name,
+    this.properties = const [],
+  });
+
+  factory Entity.fromMap(Map<String, dynamic> map) {
+    return Entity(
+      name: map['name'],
+      properties: List<EntityProperty>.from(
+          map['properties']?.map((x) => EntityProperty.fromMap(x))),
+    );
   }
 
-  List<EntityProperty> get properties => _properties;
-
-  int get propertyCount => _properties.length;
+  int get propertyCount => properties.length;
 
   int get entityPropertyCount {
     int count = 0;
-    for (EntityProperty property in _properties) {
+    for (EntityProperty property in properties) {
       if (property.type == EntityPropertyType.entity) {
         count++;
       }
     }
     return count;
+  }
+
+  void addProperty(EntityProperty property) {
+    properties = [...properties, property];
   }
 
   @override
@@ -43,5 +54,12 @@ class Entity implements Comparable<Entity> {
       }
     }
     return hasSameProperties;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'properties': properties.map((property) => property.toMap()).toList(),
+    };
   }
 }

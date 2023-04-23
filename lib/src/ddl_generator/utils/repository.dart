@@ -79,5 +79,7 @@ String mySQLTypeConversion(EntityPropertyType type) {
       return 'SMALLINT';
     case EntityPropertyType.entity:
       return '$type';
+    default:
+      return 'TEXT';
   }
 }

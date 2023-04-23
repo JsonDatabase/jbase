@@ -10,45 +10,39 @@ class EntityRepository {
   final List<Entity> _entities = [];
 
   Entity addEntity(String name, String json) {
-    List<Map<String, dynamic>> tempEntities = [];
     Entity? existingEntity = matchingEntity(json);
     if (existingEntity != null) {
       return existingEntity;
     }
-    Entity entity = Entity();
-    entity.name = name;
+    Entity entity = Entity(name: name);
     JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
-    jsonParserResult.mappedJson.forEach((key, value) {
+    for (int i = 0; i < jsonParserResult.mappedJson.length; i++) {
       EntityPropertyType entityPropertyType = EntityPropertyType.string;
       Entity? entityPropertyValue;
+      String key = jsonParserResult.mappedJson.keys.elementAt(i);
+      dynamic value = jsonParserResult.mappedJson.values.elementAt(i);
       if (value is int) {
         entityPropertyType = EntityPropertyType.int;
       } else if (value is double) {
         entityPropertyType = EntityPropertyType.double;
       } else if (value is bool) {
         entityPropertyType = EntityPropertyType.bool;
-      } else if (value[0] is Map<String, dynamic>) {
-        // Add Check for Array of Entities
-        value[0][entity.name] = jsonDecode(json);
-        tempEntities.add({
-          'key': key,
-          'value': value[0],
-        });
-        return;
+      } else if (value is String) {
+        entityPropertyType = EntityPropertyType.string;
       } else if (value is Map<String, dynamic>) {
         entityPropertyValue = addEntity(key, jsonEncode(value));
         entityPropertyType = EntityPropertyType.entity;
+      } else if (value is List<dynamic> && value.isNotEmpty) {
+        dynamic firstValue = value.first;
+        entityPropertyValue = addEntity(key, jsonEncode(firstValue));
+        entityPropertyType = EntityPropertyType.list;
+      } else {
+        continue;
       }
-      EntityProperty entityProperty = EntityProperty(key,
-          type: entityPropertyType, value: entityPropertyValue);
-      entity.properties.add(entityProperty);
-    });
+      entity.addProperty(EntityProperty(
+          key: key, type: entityPropertyType, value: entityPropertyValue));
+    }
     _entities.add(entity);
-
-    tempEntities.forEach((tempEntity) {
-      addEntity(tempEntity['key'], jsonEncode(tempEntity['value']));
-    });
-
     return entity;
   }
 
@@ -56,12 +50,21 @@ class EntityRepository {
     _entities.removeWhere((entity) => entity.name == name);
   }
 
-  get entities => _entities;
+  List<Entity> get entities => _entities;
+
+  Entity? getEntity(String name) {
+    List<Entity> matchingEntities =
+        _entities.where((entity) => entity.name == name).toList();
+    if (matchingEntities.isNotEmpty) {
+      return matchingEntities.first;
+    }
+    return null;
+  }
 
   Entity? matchingEntity(String json) {
     Entity? matchingEntity;
     JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
-    _entities.forEach((entity) {
+    for (Entity entity in _entities) {
       for (int i = 0; i < entity.properties.length; i++) {
         matchingEntity = entity;
 
@@ -70,7 +73,7 @@ class EntityRepository {
           matchingEntity = null;
         }
       }
-    });
+    }
     return matchingEntity;
   }
 }
