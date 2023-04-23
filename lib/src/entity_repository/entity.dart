@@ -2,7 +2,7 @@ import 'package:jbase_package/src/entity_repository/entity_property.dart';
 
 class Entity implements Comparable<Entity> {
   List<EntityProperty> properties = [];
-  final String name;
+  String name;
 
   Entity({
     required this.name,
