@@ -7,8 +7,26 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityDDL(Entity entity) {
-    // TODO: implement generateEntityDDL
-    throw UnimplementedError();
+    String ddl = 'CREATE TABLE ${entity.name} (\n';
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
+      if (property.type == EntityPropertyType.entity) {
+        ddl +=
+            '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
+      } else {
+        ddl +=
+            '  ${property.key.toLowerCase()} ${mySQLTypeConversion(property.type)}${!isLastProperty ? ',' : ''}\n';
+      }
+    }
+    for (EntityProperty property in entity.properties) {
+      if (property.type == EntityPropertyType.entity) {
+        ddl +=
+            '  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id); \n';
+      }
+    }
+    ddl += ');\n\n';
+    return ddl;
   }
 
   @override

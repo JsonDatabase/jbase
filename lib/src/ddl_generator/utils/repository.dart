@@ -4,7 +4,8 @@ String stringRepo(Entity entity, String value, DatabaseType databaseType) {
   switch (databaseType) {
     case DatabaseType.mysql:
       dynamic body = mySqlRepo(value, entity);
-      return body[0];
+      print(body);
+      return body[value][0];
     case DatabaseType.postgresql:
       return 'package:jbase_package/src/repository/postgresql_repository.dart';
     case DatabaseType.sqlserver:
@@ -15,7 +16,7 @@ String stringRepo(Entity entity, String value, DatabaseType databaseType) {
 }
 
 mySqlRepo(String value, Entity entity) {
-  return {
+  Map<String, dynamic> repoList = {
     'createTableHeader': 'CREATE TABLE ${entity.name.toLowerCase()} (\n',
     'createTableBaseColumn': entity.properties.map((property) => property
                 .type ==
@@ -65,6 +66,8 @@ mySqlRepo(String value, Entity entity) {
         ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n'),
     'footer': '\n\nEND',
   };
+
+  return repoList[value];
 }
 
 String mySQLTypeConversion(EntityPropertyType type) {
