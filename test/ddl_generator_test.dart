@@ -9,7 +9,7 @@ void main() {
     ControlPlaneSetting controlPlaneSetting = ControlPlaneSetting();
     ControlPlane controlPlane = ControlPlane(controlPlaneSetting);
     EntityRepository entityRepository = EntityRepository(controlPlane);
-    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8, "address": {"street": "Main Street", "number": 123}}';
+    String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8, "addresses": [{"street": "Main Street", "number": 123}, {"street": "Second Street", "number": 456}]}';
     Entity person = entityRepository.addEntity('Person', json);
     MYSQLDatabaseManagementSystem dbms =
         MYSQLDatabaseManagementSystem(ControlPlaneSetting());

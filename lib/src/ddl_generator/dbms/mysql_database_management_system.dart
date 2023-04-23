@@ -11,6 +11,8 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     String ddl = '';
     for (Entity entity in entityRepository.entities) {
       ddl += generateEntityDDL(entity);
+    }
+    for (Entity entity in entityRepository.entities) {
       ddl += generateEntityStoredProcedures(entity);
     }
     return ddl;
@@ -20,10 +22,18 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   String generateEntityDDL(Entity entity) {
     String ddl = 'CREATE TABLE ${entity.name} (\n';
     ddl += _generatePrimaryKey();
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties
+        .removeWhere((property) => property.type == EntityPropertyType.list);
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
       if (property.type == EntityPropertyType.entity) {
+        ddl +=
+            '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
+      } else if (property.type == EntityPropertyType.list) {
+        continue;
+      } else if (property.type == EntityPropertyType.foreignKey) {
         ddl +=
             '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
       } else {
@@ -34,7 +44,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (EntityProperty property in entity.properties) {
       if (property.type == EntityPropertyType.entity) {
         ddl +=
-            '  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id) \n';
+            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id) \n';
+      } else if (property.type == EntityPropertyType.foreignKey) {
+        ddl +=
+            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.key} (id) \n';
       }
     }
     ddl += ');\n\n';
@@ -50,42 +63,56 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityGetAllStoredProcedure(Entity entity) {
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties.removeWhere(
+        (property) => property.type == EntityPropertyType.foreignKey);
     String body =
         'CREATE PROCEDURE ${entity.name}GetAll() \nBEGIN \n\n SELECT JSON_ARRAYAGG(JSON_OBJECT(\n';
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
       if (property.type == EntityPropertyType.entity) {
         body +=
             generateInnerSelectNested(property.value as Entity, entity.name);
-      } else {
+      } else if (property.type == EntityPropertyType.list) {
+        body += generateInnerSelectArray(property.value as Entity, entity.name);
+      } else if (property.type != EntityPropertyType.foreignKey) {
         body +=
             "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+      } else {
+        continue;
       }
     }
     body +=
-        ' ))\n ) FROM ${entity.name} ${entity.name.substring(0, 2).toLowerCase()};\n\nEND;';
+        ' )\n ) FROM ${entity.name} ${entity.name.substring(0, 2).toLowerCase()};\n\nEND;\n\n';
     return body;
   }
 
   @override
   String generateEntityGetByIdStoredProcedure(Entity entity) {
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties.removeWhere(
+        (property) => property.type == EntityPropertyType.foreignKey);
     String body =
         'CREATE PROCEDURE ${entity.name}GetById(${entity.name.substring(0, 2).toLowerCase()}Id bigint unsigned) \nBEGIN\n\n';
     body += 'SELECT JSON_OBJECT(\n';
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
       if (property.type == EntityPropertyType.entity) {
         body +=
             generateInnerSelectNested(property.value as Entity, entity.name);
+      } else if (property.type == EntityPropertyType.list) {
+        body += generateInnerSelectArray(property.value as Entity, entity.name);
+      } else if (property.type == EntityPropertyType.foreignKey) {
+        //generateInnerSelectArray(property.value as Entity, entity.name);
       } else {
         body +=
             "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
       }
     }
     body +=
-        '))\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
+        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
     body += '\n\nEND;';
     return body;
   }
@@ -109,7 +136,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
-      if (property.type != EntityPropertyType.entity) {
+      if (property.type == EntityPropertyType.foreignKey) {
+        ddl +=
+            '   ${property.key.substring(0, 1)}id${!isLastProperty ? ',' : ''}\n';
+      } else if (property.type != EntityPropertyType.entity) {
         ddl += '   ${property.key}${!isLastProperty ? ',' : ''}\n';
       } else {
         ddl +=
@@ -123,6 +153,9 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       if (property.type != EntityPropertyType.entity) {
         ddl +=
             '   JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',' : ''}\n';
+      } else if (property.type != EntityPropertyType.foreignKey) {
+        ddl +=
+            '   ${property.key.substring(0, 1)}${!isLastProperty ? ',' : ''}\n';
       } else {
         ddl +=
             '   @var${property.key.toUpperCase()}Id${!isLastProperty ? ',' : ''}\n';
@@ -152,8 +185,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
-      bool nextPropertyIsEntity = false;
-      if (property.type != EntityPropertyType.entity) {
+      bool nextPropertyIsEntity = i < entity.properties.length - 1 &&
+          entity.properties[i + 1].type == EntityPropertyType.entity;
+      if (property.type != EntityPropertyType.entity &&
+          property.type != EntityPropertyType.foreignKey) {
         ddl +=
             '   ${property.key} = JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty && !nextPropertyIsEntity ? ',\n' : ''}';
       }
@@ -238,7 +273,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   String generateInnerSelectNested(Entity entity, String parentName) {
     String returnString = '   \'${entity.name}\', (';
-    returnString += selectJson();
+    returnString += 'SELECT JSON_OBJECT(\n';
     for (int i = 0; i < entity.properties.length; i++) {
       EntityProperty property = entity.properties[i];
       bool isLastProperty = i == entity.properties.length - 1;
@@ -246,7 +281,24 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
           "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
     }
     returnString +=
-        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.id = ${parentName.substring(0, 2).toLowerCase()}.${entity.name.substring(0, 1)}id';
+        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.id = ${parentName.substring(0, 2).toLowerCase()}.${entity.name.substring(0, 1)}id)';
+    return returnString;
+  }
+
+  String generateInnerSelectArray(Entity entity, String parentName) {
+    String returnString = '   \'${entity.name}\', (';
+    returnString += 'SELECT JSON_ARRAYAGG(JSON_OBJECT(\n';
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties.removeWhere(
+        (property) => property.type == EntityPropertyType.foreignKey);
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
+      returnString +=
+          "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+    }
+    returnString +=
+        '))\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.${parentName.substring(0, 1).toLowerCase()}id = ${parentName.substring(0, 2).toLowerCase()}.id)';
     return returnString;
   }
 

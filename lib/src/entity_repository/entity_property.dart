@@ -1,11 +1,11 @@
 import 'package:jbase_package/src/entity_repository/entity.dart';
 
-enum EntityPropertyType { string, int, double, bool, entity, list }
+enum EntityPropertyType { string, int, double, bool, entity, list, foreignKey }
 
 class EntityProperty {
   final String key;
   final EntityPropertyType type;
-  final Entity? value;
+  Entity? value;
   String databaseManagementSystemColumnType = "VARCHAR";
   String? defaultValue;
   bool isPrimaryKey = false;
@@ -28,6 +28,10 @@ class EntityProperty {
       defaultValue: map['defaultValue'],
       isPrimaryKey: map['isPrimaryKey'] ?? false,
     );
+  }
+
+  void addValue (Entity entity) {
+    value = entity;
   }
 
   bool get isEntity => type == EntityPropertyType.entity && value != null;

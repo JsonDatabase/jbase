@@ -17,6 +17,7 @@ class EntityRepository {
     }
     Entity entity = Entity(name: name.toLowerCase());
     JsonParserResult jsonParserResult = _jsonParser.buildMapFromJson(json);
+    List<Map<String, dynamic>> nestedArrayEntities = [];
     for (int i = 0; i < jsonParserResult.mappedJson.length; i++) {
       EntityPropertyType entityPropertyType = EntityPropertyType.string;
       Entity? entityPropertyValue;
@@ -29,17 +30,25 @@ class EntityRepository {
       } else if (value is bool) {
         entityPropertyType = EntityPropertyType.bool;
       } else if (value is String) {
-        entityPropertyType = EntityPropertyType.string;
-      } else if (value is Map<String, dynamic>) { //Nested
+        if (value == 'NESTED_ARRAY') {
+          entityPropertyType = EntityPropertyType.foreignKey;
+        } else {
+          entityPropertyType = EntityPropertyType.string;
+        }
+      } else if (value is Map<String, dynamic>) {
+        //Nested
         if (value == {}) {
           continue;
         }
         entityPropertyValue = addEntity(key, jsonEncode(value));
         entityPropertyType = EntityPropertyType.entity;
-      } else if (value is List<dynamic> && value.isNotEmpty) { // Array
+      } else if (value is List<dynamic> && value.isNotEmpty) {
+        // Array
         dynamic firstValue = value.first;
         if (firstValue is Map<String, dynamic>) {
-          entityPropertyValue = addEntity(key, jsonEncode(firstValue));
+          //entityPropertyValue = addEntity(key, jsonEncode(value));
+          firstValue[entity.name] = 'NESTED_ARRAY';
+          nestedArrayEntities.add({'key': key, 'value': firstValue});
         } else {
           continue;
         }
@@ -47,17 +56,38 @@ class EntityRepository {
       } else {
         continue;
       }
-      final String databaseManagementSystemColumnType = controlPlane
-          .databaseManagementSystem
-          .entityPropertyTypeToColumnDataType(entityPropertyType);
-      entity.addProperty(EntityProperty(
-          key: key,
-          type: entityPropertyType,
-          value: entityPropertyValue,
-          databaseManagementSystemColumnType:
-              databaseManagementSystemColumnType));
+      if (entityPropertyType == EntityPropertyType.list) {
+        continue;
+      } else {
+        final String databaseManagementSystemColumnType = controlPlane
+            .databaseManagementSystem
+            .entityPropertyTypeToColumnDataType(entityPropertyType);
+        entity.addProperty(EntityProperty(
+            key: key,
+            type: entityPropertyType,
+            value: entityPropertyValue,
+            databaseManagementSystemColumnType:
+                databaseManagementSystemColumnType));
+      }
     }
     _entities.add(entity);
+
+    nestedArrayEntities.forEach((element) {
+      Entity arrayEntity =
+          addEntity(element['key'], jsonEncode(element['value']));
+
+      Entity? parentEntity = getEntity(entity.name);
+      if (parentEntity != null) {
+        parentEntity.addProperty(EntityProperty(
+            key: element['key'],
+            type: EntityPropertyType.list,
+            value: arrayEntity,
+            databaseManagementSystemColumnType: controlPlane
+                .databaseManagementSystem
+                .entityPropertyTypeToColumnDataType(EntityPropertyType.list)));
+      }
+    });
+
     return entity;
   }
 

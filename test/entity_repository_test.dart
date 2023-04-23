@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 void main() {
   test('Create Entity', () {
-    EntityRepository entityRepository = EntityRepository();
+    EntityRepository entityRepository = EntityRepository()
+    );
     String json = '{"name": "John", "age": 30, "over_18": true, "height": 1.8}';
     entityRepository.addEntity('Person', json);
     Entity? entity = entityRepository.getEntity('Person');
