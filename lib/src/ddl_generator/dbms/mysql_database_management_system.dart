@@ -38,7 +38,13 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityGetAllStoredProcedure(Entity entity) {
-    return '';
+    String body =
+        'CREATE PROCEDURE ${entity.name}GetAll() \nBEGIN \n\n SELECT JSON_ARRAYAGG(JSON_OBJECT(\n';
+    entity.properties.forEach((property) {
+      body += "   '${property.key}', ${property.key},\n";
+    });
+    body += '   ))\n FROM ${entity.name};\n\nEND';
+    return body;
   }
 
   @override
@@ -116,6 +122,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     ddl += '\n\n';
     ddl += generateEntityGetByIdStoredProcedure(entity);
     ddl += '\n\n';
+    ddl += generateEntityGetAllStoredProcedure(entity);
     return ddl;
   }
 
