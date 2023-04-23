@@ -1,9 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jbase_package/jbase_package.dart';
-import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
-import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/mysql_database_management_system.dart';
-import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_property.dart';
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
@@ -16,7 +13,7 @@ void main() {
     Entity person = entityRepository.addEntity('Person', json);
     MYSQLDatabaseManagementSystem dbms =
         MYSQLDatabaseManagementSystem(ControlPlaneSetting());
-    String ddl = dbms.generateEntityUpdateStoredProcedure(person);
+    String ddl = dbms.generateEntityStoredProcedures(person);
     print(ddl);
     // expect(
     //     ddl,

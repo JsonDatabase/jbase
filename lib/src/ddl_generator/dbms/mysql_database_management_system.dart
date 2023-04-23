@@ -38,14 +38,24 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityGetAllStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityGetAllStoredProcedure
-    throw UnimplementedError();
+    return '';
   }
 
   @override
   String generateEntityGetByIdStoredProcedure(Entity entity) {
-    // TODO: implement generateEntityGetByIdStoredProcedure
-    throw UnimplementedError();
+    String body =
+        'CREATE PROCEDURE ${entity.name}GetById(${entity.name.substring(0, 2).toLowerCase()}Id bigint unsigned) \nBEGIN\n\n';
+    body += 'SELECT JSON_OBJECT(\n';
+    entity.properties.forEach((property) {
+      if (property.type == EntityPropertyType.entity) {
+        body += generateInnerSelect(property.value as Entity);
+      } else {
+        body += byIdBody(property);
+      }
+    });
+    body += byIdFooter(entity);
+    body += '\n\nEND';
+    return body;
   }
 
   @override
@@ -97,8 +107,16 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityStoredProcedures(Entity entity) {
-    // TODO: implement generateEntityStoredProcedures
-    throw UnimplementedError();
+    String ddl = '';
+    ddl += generateEntityInsertStoredProcedure(entity);
+    ddl += '\n\n';
+    ddl += generateEntityUpdateStoredProcedure(entity);
+    ddl += '\n\n';
+    ddl += generateEntityDeleteStoredProcedure(entity);
+    ddl += '\n\n';
+    ddl += generateEntityGetByIdStoredProcedure(entity);
+    ddl += '\n\n';
+    return ddl;
   }
 
   @override
@@ -158,4 +176,27 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
         return '';
     }
   }
+}
+
+String generateInnerSelect(Entity entity) {
+  String returnString = '\'${entity.name}\', (';
+  returnString += selectJson();
+  entity.properties.forEach((property) {
+    returnString += byIdBody(property);
+    if (property.type == EntityPropertyType.entity) {}
+  });
+  returnString += byIdFooter(entity);
+  return returnString;
+}
+
+String byIdFooter(Entity entity) {
+  return '   )\n FROM ${entity.name} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
+}
+
+String byIdBody(EntityProperty property) {
+  return "   '${property.key}', ${property.key},\n";
+}
+
+String selectJson() {
+  return 'SELECT JSON_OBJECT(\n';
 }
