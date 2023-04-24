@@ -40,7 +40,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
         ddl +=
             '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
       } else {
-        if (property.key == 'id') {
+        if (property.key == 'id' && property.key.length == 2) {
           ddl += '';
         } else {
           ddl +=
@@ -346,10 +346,12 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < tableProperties.length; i++) {
       EntityProperty property = tableProperties[i];
       bool isLastProperty = i == tableProperties.length - 1;
-      if(property.type == EntityPropertyType.list){
-        returnString += generateInnerSelectArray(property.value as Entity, entity.name);
-      } else if(property.type == EntityPropertyType.entity){
-        returnString += generateInnerSelectNested(property.value as Entity, entity.name);
+      if (property.type == EntityPropertyType.list) {
+        returnString +=
+            generateInnerSelectArray(property.value as Entity, entity.name);
+      } else if (property.type == EntityPropertyType.entity) {
+        returnString +=
+            generateInnerSelectNested(property.value as Entity, entity.name);
       } else {
         returnString +=
             "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
