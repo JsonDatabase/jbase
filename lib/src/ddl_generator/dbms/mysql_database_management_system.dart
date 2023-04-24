@@ -37,6 +37,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       } else if (property.type == EntityPropertyType.list) {
         continue;
       } else if (property.type == EntityPropertyType.foreignKey) {
+        hasForeignKey = true;
         ddl +=
             '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
       } else {
@@ -48,9 +49,15 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
         }
       }
     }
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    List<EntityProperty> foreignKeyList = [...entity.properties];
+    foreignKeyList.removeWhere((property) =>
+        property.type != EntityPropertyType.entity &&
+        property.type != EntityPropertyType.foreignKey);
+
+    for (int i = 0; i < foreignKeyList.length; i++) {
+      EntityProperty property = foreignKeyList[i];
+      bool isLastProperty = i == foreignKeyList.length - 1;
+
       if (property.type == EntityPropertyType.entity) {
         ddl +=
             '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id)${!isLastProperty ? ',' : ''} \n';
