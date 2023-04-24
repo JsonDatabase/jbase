@@ -20,15 +20,18 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityDDL(Entity entity) {
+    bool primaryKeys = false;
     String ddl = 'CREATE TABLE ${entity.name} (\n';
     ddl += _generatePrimaryKey();
     List<EntityProperty> tableProperties = [...entity.properties];
     tableProperties
         .removeWhere((property) => property.type == EntityPropertyType.list);
+    bool hasForeignKey = false;
     for (int i = 0; i < tableProperties.length; i++) {
       EntityProperty property = tableProperties[i];
       bool isLastProperty = i == tableProperties.length - 1;
       if (property.type == EntityPropertyType.entity) {
+        hasForeignKey = true;
         ddl +=
             '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
       } else if (property.type == EntityPropertyType.list) {
@@ -37,17 +40,23 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
         ddl +=
             '  ${property.key.substring(0, 1).toLowerCase()}id BIGINT UNSIGNED NOT NULL,\n';
       } else {
-        ddl +=
-            '  ${property.key.toLowerCase()} ${entityPropertyTypeToColumnDataType(property.type)}${!isLastProperty ? ',' : ''}\n';
+        if (property.key == 'id') {
+          ddl += '';
+        } else {
+          ddl +=
+              '  ${property.key.toLowerCase()} ${entityPropertyTypeToColumnDataType(property.type)}${!isLastProperty || hasForeignKey ? ',' : ''}\n';
+        }
       }
     }
-    for (EntityProperty property in entity.properties) {
+    for (int i = 0; i < entity.properties.length; i++) {
+      EntityProperty property = entity.properties[i];
+      bool isLastProperty = i == entity.properties.length - 1;
       if (property.type == EntityPropertyType.entity) {
         ddl +=
-            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id) \n';
+            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.value?.name.toLowerCase()} (id)${!isLastProperty ? ',' : ''} \n';
       } else if (property.type == EntityPropertyType.foreignKey) {
         ddl +=
-            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.key} (id) \n';
+            '\n  CONSTRAINT ${property.key.toLowerCase()}_${entity.name.toLowerCase()}_${property.value?.name.toLowerCase()}_id_fk FOREIGN KEY (${property.key.substring(0, 1).toLowerCase()}id) REFERENCES ${property.key} (id)${!isLastProperty ? ',' : ''} \n';
       }
     }
     ddl += ');\n\n';
@@ -86,7 +95,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       }
     }
     body +=
-        ' )\n ) FROM ${entity.name} ${entity.name.substring(0, 2).toLowerCase()};\n\nEND;\n\n';
+        ' )\n ) FROM ${entity.name} ${entity.name.substring(0, 3).toLowerCase()};\n\nEND;\n\n';
     return body;
   }
 
@@ -116,7 +125,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       }
     }
     body +=
-        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
+        ')\n FROM ${entity.name} ${entity.name.substring(0, 3)} WHERE id = ${entity.name.substring(0, 2).toLowerCase()}Id;';
     body += '\n\nEND;';
     return body;
   }
@@ -246,8 +255,8 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     String ddl = '';
     ddl += generateEntityInsertStoredProcedure(entity);
     ddl += '\n\n';
-    ddl += generateEntityUpdateStoredProcedure(entity);
-    ddl += '\n\n';
+    // ddl += generateEntityUpdateStoredProcedure(entity);
+    // ddl += '\n\n';
     ddl += generateEntityDeleteStoredProcedure(entity);
     ddl += '\n\n';
     ddl += generateEntityGetByIdStoredProcedure(entity);
@@ -324,7 +333,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
           "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
     }
     returnString +=
-        ')\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.id = ${parentName.substring(0, 2).toLowerCase()}.${entity.name.substring(0, 1)}id)';
+        ')\n FROM ${entity.name} ${entity.name.substring(0, 3)} WHERE ${entity.name.substring(0, 3).toLowerCase()}.id = ${parentName.substring(0, 3).toLowerCase()}.${entity.name.substring(0, 1)}id)';
     return returnString;
   }
 
@@ -341,7 +350,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
           "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
     }
     returnString +=
-        '))\n FROM ${entity.name} ${entity.name.substring(0, 2)} WHERE ${entity.name.substring(0, 2).toLowerCase()}.${parentName.substring(0, 1).toLowerCase()}id = ${parentName.substring(0, 2).toLowerCase()}.id)';
+        '))\n FROM ${entity.name} ${entity.name.substring(0, 3)} WHERE ${entity.name.substring(0, 3).toLowerCase()}.${parentName.substring(0, 1).toLowerCase()}id = ${parentName.substring(0, 3).toLowerCase()}.id)';
     return returnString;
   }
 
