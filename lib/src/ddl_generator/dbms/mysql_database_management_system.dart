@@ -346,8 +346,14 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     for (int i = 0; i < tableProperties.length; i++) {
       EntityProperty property = tableProperties[i];
       bool isLastProperty = i == tableProperties.length - 1;
-      returnString +=
-          "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+      if(property.type == EntityPropertyType.list){
+        returnString += generateInnerSelectArray(property.value as Entity, entity.name);
+      } else if(property.type == EntityPropertyType.entity){
+        returnString += generateInnerSelectNested(property.value as Entity, entity.name);
+      } else {
+        returnString +=
+            "      '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
+      }
     }
     returnString +=
         '))\n FROM ${entity.name} ${entity.name.substring(0, 3)} WHERE ${entity.name.substring(0, 3).toLowerCase()}.${parentName.substring(0, 1).toLowerCase()}id = ${parentName.substring(0, 3).toLowerCase()}.id)';
