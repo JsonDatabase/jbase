@@ -133,13 +133,12 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       ddl += ' DECLARE i INT; \n SET i = 0;\n\n';
     }
     for (EntityProperty property in tableProperties) {
-      if( property.type == EntityPropertyType.foreignKey){
+      if (property.type == EntityPropertyType.foreignKey) {
         ddl +=
-          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase().substring(0,1)}id\');\n';
-      }
-      else{
+            ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase().substring(0, 1)}id\');\n';
+      } else {
         ddl +=
-          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
+            ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
       }
     }
     for (EntityProperty property in tableProperties) {
