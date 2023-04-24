@@ -53,10 +53,8 @@ class ControlPlane {
   }
 
   String generateDDL() {
-    // return _entityRepository.entities.map((entity) {
-    //   return _databaseManagementSystem.generate(entity);
-    // }).join('\n');
-    return '';
+    return _databaseManagementSystem
+        .generateExecutableEntityDDL(_entityRepository);
   }
 
   String generateIndividualDDL(Entity entity) {
