@@ -74,8 +74,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       if (property.type == EntityPropertyType.entity) {
         body +=
             generateInnerSelectNested(property.value as Entity, entity.name);
+        isLastProperty ? '' : body += ',';
       } else if (property.type == EntityPropertyType.list) {
         body += generateInnerSelectArray(property.value as Entity, entity.name);
+        isLastProperty ? '' : body += ',';
       } else if (property.type != EntityPropertyType.foreignKey) {
         body +=
             "   '${property.key}', ${property.key}${!isLastProperty ? ',' : ''}\n";
@@ -102,8 +104,10 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       if (property.type == EntityPropertyType.entity) {
         body +=
             generateInnerSelectNested(property.value as Entity, entity.name);
+        isLastProperty ? '' : body += ',';
       } else if (property.type == EntityPropertyType.list) {
         body += generateInnerSelectArray(property.value as Entity, entity.name);
+        isLastProperty ? '' : body += ',';
       } else if (property.type == EntityPropertyType.foreignKey) {
         //generateInnerSelectArray(property.value as Entity, entity.name);
       } else {
@@ -119,13 +123,26 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
 
   @override
   String generateEntityInsertStoredProcedure(Entity entity) {
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties
+        .removeWhere((property) => property.type == EntityPropertyType.list);
     String ddl =
         'CREATE PROCEDURE ${entity.name}Create(${entity.name.substring(0, 2).toLowerCase()}Obj JSON)\nBEGIN\n\n';
-    for (EntityProperty property in entity.properties) {
-      ddl +=
-          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
+    if (entity.properties
+        .any((property) => property.type == EntityPropertyType.list)) {
+      ddl += ' DECLARE i INT; \n SET i = 0;\n\n';
     }
-    for (EntityProperty property in entity.properties) {
+    for (EntityProperty property in tableProperties) {
+      if( property.type == EntityPropertyType.foreignKey){
+        ddl +=
+          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase().substring(0,1)}id\');\n';
+      }
+      else{
+        ddl +=
+          ' SET @var${property.key.toUpperCase()} = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}\');\n';
+      }
+    }
+    for (EntityProperty property in tableProperties) {
       if (property.type == EntityPropertyType.entity) {
         ddl +=
             '\n CALL ${property.value?.name}Create(@var${property.key.toUpperCase()});\n';
@@ -133,9 +150,9 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       }
     }
     ddl += '\n INSERT INTO ${entity.name} (\n';
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
       if (property.type == EntityPropertyType.foreignKey) {
         ddl +=
             '   ${property.key.substring(0, 1)}id${!isLastProperty ? ',' : ''}\n';
@@ -147,21 +164,45 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       }
     }
     ddl += '\n ) VALUES (\n';
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
       if (property.type != EntityPropertyType.entity) {
         ddl +=
             '   JSON_UNQUOTE(@var${property.key.toUpperCase()})${!isLastProperty ? ',' : ''}\n';
       } else if (property.type != EntityPropertyType.foreignKey) {
         ddl +=
-            '   ${property.key.substring(0, 1)}${!isLastProperty ? ',' : ''}\n';
+            '   @var${property.key.toUpperCase()}Id${!isLastProperty ? ',' : ''}\n';
       } else {
         ddl +=
             '   @var${property.key.toUpperCase()}Id${!isLastProperty ? ',' : ''}\n';
       }
     }
-    ddl += ' );\n\nEND;';
+
+    ddl += '\n );\n\n';
+
+    if (entity.properties
+        .any((property) => property.type == EntityPropertyType.list)) {
+      String entryId = '@${entity.name.substring(0, 2).toLowerCase()}Id';
+      ddl += ' SET $entryId = LAST_INSERT_ID();\n\n';
+      List<EntityProperty> tableProperties = [...entity.properties];
+      tableProperties
+          .removeWhere((property) => property.type != EntityPropertyType.list);
+      for (EntityProperty property in tableProperties) {
+        ddl +=
+            ' IF JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, CONCAT(\'\$.${property.key.toLowerCase()}[\', i, \']\')) IS NOT NULL THEN\n  REPEAT\n';
+        ddl +=
+            'SET @cursor = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, CONCAT(\'\$.${property.key.toLowerCase()}[\', i, \']\'));';
+        ddl +=
+            ' SET @cursor = JSON_SET(@cursor, \'\$.${entity.name.substring(0, 1)}id\', $entryId);\n';
+        ddl += ' CALL ${property.value?.name}Create(@cursor);\n';
+        ddl += ' SET i = i + 1;\n';
+        ddl +=
+            ' UNTIL JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, CONCAT(\'\$.${property.key.toLowerCase()}[\', i, \']\')) IS NULL END REPEAT;\nEND IF;\n\n';
+      }
+    }
+
+    ddl += 'END;';
     return ddl;
   }
 
@@ -182,10 +223,13 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       }
     }
     ddl += '\n UPDATE ${entity.name} SET\n';
-    for (int i = 0; i < entity.properties.length; i++) {
-      EntityProperty property = entity.properties[i];
-      bool isLastProperty = i == entity.properties.length - 1;
-      bool nextPropertyIsEntity = i < entity.properties.length - 1 &&
+    List<EntityProperty> tableProperties = [...entity.properties];
+    tableProperties.removeWhere(
+        (property) => property.type == EntityPropertyType.foreignKey);
+    for (int i = 0; i < tableProperties.length; i++) {
+      EntityProperty property = tableProperties[i];
+      bool isLastProperty = i == tableProperties.length - 1;
+      bool nextPropertyIsEntity = i < tableProperties.length - 1 &&
           entity.properties[i + 1].type == EntityPropertyType.entity;
       if (property.type != EntityPropertyType.entity &&
           property.type != EntityPropertyType.foreignKey) {
