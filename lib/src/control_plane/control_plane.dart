@@ -64,4 +64,8 @@ class ControlPlane {
   Future<bool> testDatabaseConnection() async {
     return await _databaseConnection.testConnection();
   }
+
+  Future<bool> executeDDL() async {
+    return await _databaseConnection.execute(generateDDL(), {});
+  }
 }
