@@ -3,7 +3,8 @@ import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
 class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
-  MYSQLDatabaseManagementSystem(ControlPlaneSetting controlPlaneSetting)
+  ControlPlaneSetting controlPlaneSetting;
+  MYSQLDatabaseManagementSystem(this.controlPlaneSetting)
       : super(controlPlaneSetting);
 
   @override
@@ -161,9 +162,15 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       if (property.type == EntityPropertyType.entity) {
         ddl +=
             '\n CALL ${property.value?.name}Create(@var${property.key.toUpperCase()});\n';
-        ddl +=
-            ' SET @var${property.key.toUpperCase()}Id = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}.id\');\n';
-        //ddl += ' SET @var${property.key.toUpperCase()}Id = LAST_INSERT_ID();\n';
+        if (controlPlaneSetting.primaryKeyIncrementStrategy ==
+            PrimaryKeyIncrementStrategy.manual) {
+          ddl +=
+              ' SET @var${property.key.toUpperCase()}Id = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}.id\');\n';
+        } else if (controlPlaneSetting.primaryKeyIncrementStrategy ==
+            PrimaryKeyIncrementStrategy.manual) {
+          ddl +=
+              ' SET @var${property.key.toUpperCase()}Id = LAST_INSERT_ID();\n';
+        }
       }
     }
     ddl += '\n INSERT INTO ${entity.name} (\n';
@@ -201,8 +208,13 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     if (entity.properties
         .any((property) => property.type == EntityPropertyType.list)) {
       String entryId = '@${entity.name.substring(0, 2).toLowerCase()}Id';
-      ddl += ' SET $entryId = @varID;\n';
-      //LAST_INSERT_ID();\n\n';
+      if (controlPlaneSetting.primaryKeyIncrementStrategy ==
+          PrimaryKeyIncrementStrategy.manual) {
+        ddl += ' SET $entryId = @varID;\n';
+      } else if (controlPlaneSetting.primaryKeyIncrementStrategy ==
+          PrimaryKeyIncrementStrategy.auto) {
+        ddl += ' SET $entryId = LAST_INSERT_ID();\n';
+      }
       List<EntityProperty> tableProperties = [...entity.properties];
       tableProperties
           .removeWhere((property) => property.type != EntityPropertyType.list);
