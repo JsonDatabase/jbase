@@ -161,7 +161,9 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
       if (property.type == EntityPropertyType.entity) {
         ddl +=
             '\n CALL ${property.value?.name}Create(@var${property.key.toUpperCase()});\n';
-        ddl += ' SET @var${property.key.toUpperCase()}Id = LAST_INSERT_ID();\n';
+        ddl +=
+            ' SET @var${property.key.toUpperCase()}Id = JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, \'\$.${property.key.toLowerCase()}.id\');\n';
+        //ddl += ' SET @var${property.key.toUpperCase()}Id = LAST_INSERT_ID();\n';
       }
     }
     ddl += '\n INSERT INTO ${entity.name} (\n';
@@ -199,11 +201,13 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
     if (entity.properties
         .any((property) => property.type == EntityPropertyType.list)) {
       String entryId = '@${entity.name.substring(0, 2).toLowerCase()}Id';
-      ddl += ' SET $entryId = LAST_INSERT_ID();\n\n';
+      ddl += ' SET $entryId = @varID;\n';
+      //LAST_INSERT_ID();\n\n';
       List<EntityProperty> tableProperties = [...entity.properties];
       tableProperties
           .removeWhere((property) => property.type != EntityPropertyType.list);
       for (EntityProperty property in tableProperties) {
+        ddl += 'SET i = 0;\n';
         ddl +=
             ' IF JSON_EXTRACT(${entity.name.substring(0, 2).toLowerCase()}Obj, CONCAT(\'\$.${property.key.toLowerCase()}[\', i, \']\')) IS NOT NULL THEN\n  REPEAT\n';
         ddl +=
@@ -314,7 +318,7 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   String entityPropertyTypeToColumnDataType(EntityPropertyType type) {
     switch (type) {
       case EntityPropertyType.bool:
-        return 'SMALLINT';
+        return 'TEXT';
       case EntityPropertyType.int:
         return 'INT';
       case EntityPropertyType.double:
