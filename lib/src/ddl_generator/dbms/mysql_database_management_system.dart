@@ -327,6 +327,33 @@ class MYSQLDatabaseManagementSystem extends DatabaseManagementSystem {
   }
 
   @override
+  List<String> keyWords() {
+    return [
+      "ADD",
+      "ALL",
+      "AND",
+      "BIG",
+      "BIN",
+      "BY",
+      "CASE",
+      "DBA",
+      "DEL",
+      "END",
+      "FOR",
+      "KEY",
+      "LOW",
+      "MOD",
+      "NOT",
+      "NOW",
+      "OR",
+      "ROW",
+      "SET",
+      "SQL",
+      "XOR"
+    ];
+  }
+
+  @override
   String entityPropertyTypeToColumnDataType(EntityPropertyType type) {
     switch (type) {
       case EntityPropertyType.bool:
