@@ -1,8 +1,10 @@
 import 'package:jbase_package/src/control_plane/control_plane_setting.dart';
 import 'package:jbase_package/src/database/database_connection.dart';
 import 'package:jbase_package/src/database/mysql_database_connection.dart';
+import 'package:jbase_package/src/database/postgres_connection.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/database_management_system.dart';
 import 'package:jbase_package/src/ddl_generator/dbms/mysql_database_management_system.dart';
+import 'package:jbase_package/src/ddl_generator/dbms/posgresql_database_managment_system.dart';
 import 'package:jbase_package/src/entity_repository/entity.dart';
 import 'package:jbase_package/src/entity_repository/entity_repository.dart';
 
@@ -32,6 +34,10 @@ class ControlPlane {
             MYSQLDatabaseConnection(_controlPlaneSetting.databaseCredential);
         break;
       case DatabaseType.postgresql:
+        _databaseManagementSystem =
+            POSGRESQLDatabaseManagementSystem(_controlPlaneSetting);
+        _databaseConnection = PostgreSQLDatabaseConnection(
+            _controlPlaneSetting.databaseCredential);
         break;
       case DatabaseType.oracle:
         break;
