@@ -36,8 +36,8 @@ class ControlPlane {
       case DatabaseType.postgresql:
         _databaseManagementSystem =
             POSGRESQLDatabaseManagementSystem(_controlPlaneSetting);
-        _databaseConnection = PostgreSQLDatabaseConnection(
-            _controlPlaneSetting.databaseCredential);
+        _databaseConnection =
+            MYSQLDatabaseConnection(_controlPlaneSetting.databaseCredential);
         break;
       case DatabaseType.oracle:
         break;
